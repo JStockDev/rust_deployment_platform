@@ -5,7 +5,7 @@ edition = "2024"
 
 [dependencies]
 # RT
-tokio = { version = "1.53.2", features = ["macros", "rt"] }
+tokio = { version = "1.53.2", features = ["macros", "rt-multi-thread", "net"] }
 
 # Web
 axum = "0.8.9"
