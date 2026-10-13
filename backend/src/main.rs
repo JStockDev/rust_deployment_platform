@@ -1,6 +1,9 @@
+use migration::{Migrator, MigratorTrait};
 use openid::Client as OpenIDClient;
 use rand::{SeedableRng, rngs::{StdRng, SysRng}};
 use reqwest::Client as HttpClient;
+use sea_orm::{Database, DatabaseConnection};
+use serde::Deserialize;
 use std::env;
 use tokio::net::TcpListener;
 use redis::{Client as RedisClient, aio::MultiplexedConnection};
@@ -20,17 +23,19 @@ async fn main() -> Result<(), CodeError> {
     let addr = env::var("ADDRESS")?;
     let listener = TcpListener::bind(addr).await?;
 
-    
     let redis = RedisClient::open(env::var("REDIS_ADDRESS")?)?;
     let redis_con = redis.get_multiplexed_async_connection().await?;
 
+    let db: DatabaseConnection = Database::connect(env::var("DATABASE_ADDRESS")?).await?;
+    Migrator::up(&db, None).await?;
+
     let http_client = HttpClient::new();
     let openid_client = oauth::build_client(http_client.clone()).await?;
-
-    let base_address = env::var("BASE_ADDRESS")?;
+    
     let state = RouterState {
         redis: redis_con,
-        base_address,
+        db,
+        base_url: env::var("BASE_ADDRESS")?,
         http_client,
         openid_client,
     };
@@ -43,7 +48,8 @@ async fn main() -> Result<(), CodeError> {
 
 pub struct RouterState {
     redis: MultiplexedConnection,
-    base_address: String,
+    db: DatabaseConnection,
+    base_url: String,
     http_client: HttpClient,
     openid_client: OpenIDClient,
 }

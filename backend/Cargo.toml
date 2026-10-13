@@ -3,6 +3,9 @@ name = "backend"
 version = "0.1.0"
 edition = "2024"
 
+[workspace]
+members = [".", "migration"]
+
 [dependencies]
 # RT
 tokio = { version = "1.53.2", features = ["macros", "rt-multi-thread", "net"] }
@@ -13,7 +16,13 @@ axum-extra = { version = "0.12.6", features = ["cookie"] }
 openid = "0.25.0"
 reqwest = "0.13.5"
 
+# DB
+redis = { version = "1.7.1", features = ["tokio-comp"] }
+sea-orm = { version = "2.0.4", features = ["sqlx-postgres", "runtime-tokio-native-tls", "with-time", "with-json", "with-uuid", "macros"] }
+migration = { path = "migration" }
+
 # Crypto
+rand = { version = "0.10.3", features = ["std_rng"] }
 hmac = "0.13.0"
 sha2 = "0.11.0"
 
@@ -29,5 +38,3 @@ base64 = "0.23.1"
 
 # Development
 dotenvy = "0.15.7"
-redis = { version = "1.7.1", features = ["tokio-comp"] }
-rand = { version = "0.10.3", features = ["std_rng"] }

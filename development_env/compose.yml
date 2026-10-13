@@ -1,0 +1,21 @@
+services:
+  redis:
+    image: redis:latest
+    container_name: uni_project_redis
+    ports:
+      - '6379:6379'
+    volumes:
+      - ./redis:/data
+    restart: unless-stopped
+
+  postgres:
+    container_name: uni_project_postgres
+    image: "postgres:latest"
+    ports:
+    - 5432:5432
+    volumes:
+      - ./postgres:/var/lib/postgresql
+    environment:
+      POSTGRES_USER: uni
+      POSTGRES_PASSWORD: uni
+      POSTGRES_DB: uni
